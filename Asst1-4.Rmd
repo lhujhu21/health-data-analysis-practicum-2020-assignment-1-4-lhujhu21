@@ -1,0 +1,83 @@
+---
+title: "Assignment 1-4: Final Module 1 Report"
+author: "Your Name"
+date: "Today's date"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Due Monday, February 24 @ midnight through Github**
+
+```{r load_libraries, echo=FALSE, include=FALSE}
+#load any of the libraries you will use in this code chunk
+library(tidyverse)
+
+```
+
+```{r read_data, echo=FALSE, include=FALSE}
+# Read in the data
+nmes_data <- read_csv("nmesUNPROC.csv")
+```
+
+```{r recode_data, echo=FALSE, include=FALSE}
+# Place any code that you used to recode the data here
+
+```
+
+**Question 1.1: How does the risk of disease compare for smokers and otherwise similar non-smokers?**
+
+```{r q1_display, echo=FALSE}
+### put code to create data display here
+
+```
+
+```{r q1_analysis, echo=FALSE}
+### put code to fit statistical mode here
+### you could use either your logistic regression model or your propensity scores model
+### or you could include both and compare the results
+
+```
+
+Write up your results HERE in a paragraph to answer Question 1.1.  In your write-up, you should refer to your data displays and your analysis results.  Be numerate!
+
+**Queston 1.2: Does the contribution of smoking to the risk of disease vary by sex or socio-economic status (SES)?**
+
+```{r q2_display, echo=FALSE}
+### put code to create data display here
+
+```
+
+```{r q2_analysis, echo=FALSE}
+### put code to fit statistical mode here
+
+```
+
+Write up your results HERE in a paragraph to answer Question 1.2.  In your write-up, you should refer to your data displays and your analysis results.  Be numerate!
+
+```{r submission_instructions, echo=FALSE, include=FALSE}
+#When you are ready to submit your assignment, do ALL of the following:
+
+#* First, knit your .Rmd file to see if it will compile.  If it doesn't knit, you can still follow the steps below to submit your assignment, but please try to resolve the knitting issues before you submit.  You can reach out to use at phbiostats@jhu.edu for help!
+
+#* Next you need to **commit** the changes you've made to the document.  Click the colorful Git button at the top of the RStudio window and select "Commit" from the menu.
+
+#* In the window that opens, **stage** your changes by clicking the check boxes next to the `Asst1-4.Rmd` and `Asst1-4.html` files.
+
+#* In the "Commit message" box, type a short description of what changes you've made, something like: `Completed assignment`
+
+#* Click the "Commit" button on the bottom right.
+
+#* You'll see a window that will tell you about the changes that you've made.  Click "Close" to close the window.  You've successfully committed! You can close this commit window now.
+
+#* After committing, you must **push** your changes to the repository on Github.  Do this by clicking the colorful Git button again and select "Push Branch".  
+
+#* Again, you'll see a window open that tells you your changes have been pushed!
+
+#* If you want, you can look at your repository on [Github.com](https://github.com/) and should be able to see your changes there!  
+
+#* You've successfully submitted your assignment :)
+```
+
