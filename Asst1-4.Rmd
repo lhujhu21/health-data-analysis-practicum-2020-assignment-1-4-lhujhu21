@@ -1,7 +1,7 @@
 ---
 title: "Assignment 1-4: Final Module 1 Report"
-author: "Your Name"
-date: "Today's date"
+author: "Lucy Hu"
+date: "20 February 2020"
 output: html_document
 ---
 
@@ -25,6 +25,58 @@ nmes_data <- read_csv("nmesUNPROC.csv")
 ```{r recode_data, echo=FALSE, include=FALSE}
 # Place any code that you used to recode the data here
 
+nmes_data <- nmes_data %>%
+  mutate(educate = factor(educate, 
+                          levels = c("1", "2", "3", "4"), 
+                          labels = c("College grad", 
+                                     "Some college", 
+                                     "HS grad", "Other")),
+         
+         eversmk = factor(eversmk, levels = c("0", "1"),
+                          labels = c("Never smoker",
+                                     "Smoker")),
+         poor = factor(poor,
+                           levels = c("0", "1"),
+                           labels = c("Not poor", "Poor")),
+         
+         lc5 = factor(lc5, levels = c("0", "1"), 
+                      labels = c("No LC", "LC")),
+         
+         chd5 = factor(chd5, levels=c("0", "1"), 
+                       labels=c("No CHD", "CHD")),
+         sex = factor(female, levels=c("0", "1"),
+                      labels=c("Male", "Female")),
+         beltuse = factor(beltuse, levels = c("1", "2", "3"),
+                          labels=c("Rare", "Some", "Always")),
+         marital = factor(marital, levels=c("1","2","3","4", "5"),
+                          labels=c("Married", "Widowed", "Divorced", "Separated", "Never Married")),
+         
+# Creating a new variable disease to combine lc5 and chd5
+         disease = factor(lc5 == "LC" | chd5 == "CHD", 
+                          levels = c(FALSE, TRUE), 
+                          labels = c("No disease", 
+                                     "Yes disease"))
+
+  )
+
+beltmarry_tab <- nmes_data %>%
+  group_by(eversmk, marital) %>%
+  count(eversmk, disease, marital) %>%
+  mutate(prop=n/sum(n)) %>%
+  filter(disease == "Yes disease")
+
+SES_tab <- nmes_data %>%
+  group_by(eversmk, educate, poor) %>%
+  count(eversmk, disease, educate, poor) %>%
+  mutate(prop=n/sum(n)) %>%
+  filter(disease == "Yes disease")
+
+sex_tab <- nmes_data %>%
+  group_by(eversmk, sex) %>%
+  count(eversmk, disease, sex) %>%
+  mutate(prop=n/sum(n)) %>%
+  filter(disease == "Yes disease")
+
 ```
 
 **Question 1.1: How does the risk of disease compare for smokers and otherwise similar non-smokers?**
@@ -32,30 +84,72 @@ nmes_data <- read_csv("nmesUNPROC.csv")
 ```{r q1_display, echo=FALSE}
 ### put code to create data display here
 
+ggplot(data = beltmarry_tab) + 
+  geom_bar(mapping = aes(x = eversmk, y = prop*100, group = disease, fill = disease), stat = "identity") + labs(title = "Smoking vs Disease Status by Marital Status", y = "Percentage", x = "Smoking Status") + scale_fill_discrete(name = "Smoking Caused Disease") +
+    facet_wrap(~marital) + theme_bw() +
+geom_text(aes(x = eversmk,y = prop, label=round(prop*100, digits = 4), group = disease), vjust=-10, size=2.8,position = position_dodge(width = 1)) + theme_minimal() 
+
 ```
+
 
 ```{r q1_analysis, echo=FALSE}
 ### put code to fit statistical mode here
 ### you could use either your logistic regression model or your propensity scores model
 ### or you could include both and compare the results
 
+model0 <- glm(disease ~ eversmk + marital, family=binomial, data=nmes_data)
+summary(model0)
+
+coef(model0)
+exp(coef(model0))
+
 ```
 
-Write up your results HERE in a paragraph to answer Question 1.1.  In your write-up, you should refer to your data displays and your analysis results.  Be numerate!
+
+This analysis compared the risk of disease for smokers vs non-smokers stratified by marital status. Based on the data displays and logistic regression; smoking significantly influenced the risk of disease holding marital status constant. The log odds of disease for smokers is `r round(coef(model0)["eversmkSmoker"], digits = 4)` higher than that of non-smokers. Thus the odds of disease for smokers is `r round(exp(coef(model0))["eversmkSmoker"], digits = 4)` times that of non-smokers. As can be seen in the graph, the risk of disease was much higher for smokers who were widowed than non-smokers who were widowed and somewhat higher for smokers who were married, separated, or never married compared to non-smokers in those categories. The risk of disease was only higher for non-smokers than in smokers for the divorced category. 
 
 **Queston 1.2: Does the contribution of smoking to the risk of disease vary by sex or socio-economic status (SES)?**
 
 ```{r q2_display, echo=FALSE}
 ### put code to create data display here
 
+ggplot(data = SES_tab) + 
+  geom_bar(mapping = aes(x = eversmk, y = prop*100, group = disease, fill = disease), stat = "identity") + labs(title = "Smoking vs Disease Status by Education and Poverty", y = "Percentage", x = "Smoking Status") + scale_fill_discrete(name = "Smoking Caused Disease") +
+    facet_grid(educate~poor) + theme_bw() +
+geom_text(aes(x = eversmk,y = prop, label=round(prop*100, digits = 4), group = disease), vjust=-5, size=2.8,position = position_dodge(width = 1)) + theme_minimal() 
+
+ggplot(data = sex_tab) + 
+  geom_bar(mapping = aes(x = eversmk, y = prop*100, group = disease, fill = disease), stat = "identity") + labs(title = "Smoking vs Disease Status by Sex", y = "Percentage", x = "Smoking Status") + scale_fill_discrete(name = "Smoking Caused Disease") +
+    facet_wrap(~sex) + theme_bw() +
+geom_text(aes(x = eversmk,y = prop, label=round(prop*100, digits = 4), group = disease), vjust=-13, size=2.8,position = position_dodge(width = 1)) + theme_minimal() 
+
 ```
 
 ```{r q2_analysis, echo=FALSE}
 ### put code to fit statistical mode here
 
+# logistical regression 
+model1 <- glm(disease ~eversmk*educate + eversmk*poor + eversmk*sex, family=binomial(link = "logit"), data=nmes_data)
+summary(model1)
+
+coef(model1)
+exp(coef(model1))
+
+
+
 ```
 
-Write up your results HERE in a paragraph to answer Question 1.2.  In your write-up, you should refer to your data displays and your analysis results.  Be numerate!
+
+Based on these data displays and logistic regression results, sex and socioeconomic status (defined here by poverty and education levels) do impact the contribution of smoking on the risk of disease. However, education did not significantly modify the effects of smoking on disease rate. As seen in the logistic regression, none of the interaction terms for smoking and education status were significant (Pr(>|z|) of less than 0.05). 
+
+Holding everything else constant, the difference in log odds of disease for those who are poor is `r round(coef(model1)["eversmkSmoker:poorPoor"], digits = 4)` higher than those who are not poor. Thus the odds ratio for the poor is `r round(exp(coef(model1))["eversmkSmoker:poorPoor"], digits = 4)` times that of those who are not poor of similar education and sex, which shows the additional affect of being poor on smoking. This can be seen in the data display as the ratios of lung cancer in smokers to non-smokers amongst the poor group was greater than that of the not-poor group. 
+
+Holding everything else constant, the difference in log odds of disease for females is  `r round(-1*coef(model1)["eversmkSmoker:sexFemale"], digits = 4)` lower than the log odds of disease for males. Thus the odds ratio for females is  `r round(exp(coef(model1))["eversmkSmoker:sexFemale"], digits = 4)` times that of males of similar education and poverty status, which shows the additional affect of being female on smoking. This can be seen in the graphical display as the percentage of lung cancer in male smokers was over twice the percentage of lung cancer in male non-smokers. The percentages of lung cancer in females were relatively comparable between smokers and non-smokers. 
+
+
+
+
+
 
 ```{r submission_instructions, echo=FALSE, include=FALSE}
 #When you are ready to submit your assignment, do ALL of the following:
