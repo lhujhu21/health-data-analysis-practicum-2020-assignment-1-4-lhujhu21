@@ -5,6 +5,22 @@ date: "20 February 2020"
 output: html_document
 ---
 
+|                      | Score |
+|----------------------|------:|
+| Q1.1 - Data display  |  4/4  |     
+| Q1.1 - Stat analysis |  4/4  |      
+| Q1.1 - Summary       |  4/4  |         
+| Q1.2 - Data display  |  3/3  |          
+| Q1.2 - Stat analysis |  3/3  |          
+| Q1.2 - Summary       |  2/2  |         
+| Total                | 20/20 | 
+
+##### Comments from Dr. Jager: 
+
+* Nice job, Lucy!  I really like the graphs you made for both questions and that you were able to put the actual percentages with disease right onto the graphs.  This makes it easy to compare the disease risks between smokers and non-smokers within each disease category.
+* I agree with your interpretation of your results for Question 1.1. Is there are reason that you chose to just use logistic regression instead of a propensity score approach to answer this question?
+* For Question 1.2, you also did a nice job interpreting your results and especially tying the results from the statistical analysis to what was seen in the graphics you made!  One comment on your final two paragraphs of interpretation: the interaction doesn't show us the additional effect of being poor on smoking, it shows the additional effect of being poor on the **relationship between smoking and disease**.  
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
